@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Serviço do Backend
+  backend:
+    build:
+      context: ./backend
+    restart: always
+    environment:
+      # As variáveis vêm do nosso arquivo .env
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=3001
+    ports:
+      # Mapeia a porta 3001 da máquina host para a porta 3001 do contêiner
+      - "3001:3001"
+    networks:
+      - app-network
+
+  # Serviço do Frontend
+  frontend:
+    build:
+      context: ./frontend
+    restart: always
+    ports:
+      # Mapeia a porta 5173 da máquina host para a porta 80 do contêiner
+      - "5173:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

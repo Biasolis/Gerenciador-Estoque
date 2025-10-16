@@ -1,0 +1,88 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem; /* Adiciona padding para telas pequenas */
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 700px; /* Aumenta a largura máxima para acomodar as colunas */
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  color: var(--gray);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.modal-footer .btn {
+  width: auto;
+  padding: 0.6rem 1.5rem;
+}
+
+.btn-secondary {
+  background-color: var(--gray);
+}
+.btn-secondary:hover {
+  background-color: var(--dark-gray);
+}
+
+/* --- NOVOS ESTILOS PARA O FORMULÁRIO EM GRADE --- */
+.form-grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Cria duas colunas de largura igual */
+  gap: 0 1.5rem; /* 0 de espaço vertical, 1.5rem de espaço horizontal */
+}
+
+/* Faz um item do grid ocupar as duas colunas */
+.grid-col-span-2 {
+  grid-column: span 2;
+}
+
+/* Estilo para campos de texto somente leitura */
+.readonly-field {
+  background-color: var(--light-gray);
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  min-height: 47px; /* Alinha com a altura dos inputs */
+}

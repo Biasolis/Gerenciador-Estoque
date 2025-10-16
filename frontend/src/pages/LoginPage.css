@@ -1,0 +1,29 @@
+.login-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-color);
+}
+
+/* --- NOVO ESTILO PARA O LOGO --- */
+.login-logo {
+  display: block;
+  max-width: 200px; /* Ajuste a largura máxima conforme necessário */
+  height: auto;
+  margin: 0 auto 1.5rem auto; /* Centraliza e adiciona espaço abaixo */
+}
+
+.login-page-container h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--dark-gray);
+}
+
+.login-page-container p {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: var(--gray);
+}

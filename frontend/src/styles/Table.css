@@ -1,0 +1,104 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.page-header h1 {
+  margin: 0;
+}
+
+.table-container {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-radius: 8px;
+  overflow: hidden; /* Garante que o border-radius seja aplicado nas bordas da tabela */
+}
+
+.table-container th, .table-container td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-container th {
+  background-color: var(--light-gray);
+  font-weight: 600;
+}
+
+.table-container tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-container tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
+.actions-cell {
+  width: 120px;
+  text-align: right;
+}
+
+.actions-cell button {
+  margin-left: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  width: auto;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+}
+
+.edit-btn {
+  background-color: #ffc107;
+}
+.edit-btn:hover {
+  background-color: #e0a800;
+}
+
+.delete-btn {
+  background-color: var(--danger-color);
+}
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Estilos para status de estoque */
+.stock-ok {
+  font-weight: bold;
+  color: #28a745; /* Verde */
+}
+
+.stock-low {
+  font-weight: bold;
+  color: #ffc107; /* Amarelo */
+}
+
+.stock-out {
+  font-weight: bold;
+  color: var(--danger-color); /* Vermelho */
+}
+
+/* Estilos para badges de status */
+.status-badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.status-active {
+  background-color: #28a745; /* Verde */
+}
+
+.status-inactive {
+  background-color: var(--gray);
+}

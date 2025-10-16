@@ -1,0 +1,42 @@
+.filters-panel {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.filters-panel .form-group {
+  margin-bottom: 0;
+}
+
+.filters-panel label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.filters-panel select,
+.filters-panel input {
+  font-size: 0.9rem;
+  padding: 0.6rem;
+}
+
+.filter-actions {
+  grid-column: 1 / -1; /* Ocupa a linha toda */
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.filter-actions .btn {
+  width: auto;
+  padding: 0.6rem 1.5rem;
+}
+
+.report-results {
+  margin-top: 2rem;
+}

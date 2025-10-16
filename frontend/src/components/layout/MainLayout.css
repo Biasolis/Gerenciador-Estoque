@@ -1,0 +1,12 @@
+.app-layout {
+  display: flex;
+}
+
+.content-area {
+  margin-left: 250px; /* Mesma largura da sidebar */
+  flex-grow: 1;
+  padding: 2rem;
+  width: calc(100% - 250px);
+  height: 100vh;
+  overflow-y: auto; /* Adiciona scroll se o conteúdo for maior que a tela */
+}
