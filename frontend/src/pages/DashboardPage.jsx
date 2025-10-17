@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import './DashboardPage.css';
 import '../styles/Table.css'; // Reutilizamos alguns estilos
+import TopSetoresChart from '../../components/dashboard/TopSetoresChart';
 
 function DashboardPage() {
   const [summary, setSummary] = useState({ totalItems: 0, lowStockItems: [] });

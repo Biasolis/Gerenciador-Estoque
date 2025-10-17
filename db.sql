@@ -91,3 +91,4 @@ ALTER TABLE stock_exits ALTER COLUMN requester_person_id DROP NOT NULL;
 
 -- Adiciona um campo de anotações na tabela de entradas
 ALTER TABLE stock_entries ADD COLUMN notes TEXT;
+
