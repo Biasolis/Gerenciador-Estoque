@@ -8,7 +8,8 @@ const personRoutes = require('./routes/personRoutes');
 const productRoutes = require('./routes/productRoutes');
 const stockRoutes = require('./routes/stockRoutes');
 const userRoutes = require('./routes/userRoutes');
-const reportRoutes = require('./routes/reportRoutes'); // <-- Importa as novas rotas
+const reportRoutes = require('./routes/reportRoutes');
+const profileRoutes = require('./routes/profileRoutes'); // <-- Importa as novas rotas de perfil
 
 const app = express();
 
@@ -28,7 +29,8 @@ app.use('/api/sectors', sectorRoutes);
 app.use('/api/people', personRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/stock', stockRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/reports', reportRoutes); // <-- Registra as rotas de relatórios
+app.use('/api/users', userRoutes); // Gestão de usuários (Admin)
+app.use('/api/reports', reportRoutes);
+app.use('/api/profile', profileRoutes); // <-- Registra as rotas de perfil
 
 module.exports = app;

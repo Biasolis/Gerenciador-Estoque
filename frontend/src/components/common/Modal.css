@@ -14,12 +14,15 @@
 
 .modal-content {
   background-color: #fff;
-  padding: 2rem;
+  padding: 0; /* REMOVE padding daqui para aplicar nas seções internas */
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   width: 90%;
-  max-width: 700px; /* Aumenta a largura máxima para acomodar as colunas */
+  max-width: 800px; /* Aumentamos um pouco a largura máxima padrão */
   position: relative;
+  display: flex; /* Usar flexbox para estrutura header/body/footer */
+  flex-direction: column; /* Organiza em coluna */
+  max-height: 90vh; /* Define altura máxima como 90% da altura da tela */
 }
 
 .modal-header {
@@ -27,8 +30,9 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1rem;
-  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem; /* Adiciona padding de volta aqui */
+  margin-bottom: 0; /* Remove margem */
+  flex-shrink: 0; /* Header não encolhe */
 }
 
 .modal-header h2 {
@@ -45,13 +49,28 @@
   color: var(--gray);
 }
 
+/* ============================================ */
+/* !! AJUSTES NO CORPO DO MODAL !!              */
+/* ============================================ */
+.modal-body {
+  padding: 1.5rem; /* Adiciona padding de volta aqui */
+  overflow-y: auto; /* Adiciona barra de rolagem vertical QUANDO necessário */
+  flex-grow: 1; /* Permite que o corpo cresça e use o espaço */
+  /* max-height: 70vh; */ /* -> Vamos controlar a altura total no .modal-content */
+}
+/* ============================================ */
+
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
+  padding: 1rem 1.5rem; /* Adiciona padding de volta aqui */
   border-top: 1px solid var(--border-color);
+  background-color: var(--light-gray); /* Fundo cinza claro para destacar */
+  border-bottom-left-radius: 8px; /* Arredonda cantos inferiores */
+  border-bottom-right-radius: 8px;
+  flex-shrink: 0; /* Footer não encolhe */
 }
 
 .modal-footer .btn {
@@ -61,28 +80,39 @@
 
 .btn-secondary {
   background-color: var(--gray);
+  color: white; /* Garante texto branco */
 }
 .btn-secondary:hover {
   background-color: var(--dark-gray);
 }
 
-/* --- NOVOS ESTILOS PARA O FORMULÁRIO EM GRADE --- */
+/* Estilos para Grid (mantém, pois podem ser usados em outros modais) */
 .form-grid-container {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Cria duas colunas de largura igual */
-  gap: 0 1.5rem; /* 0 de espaço vertical, 1.5rem de espaço horizontal */
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.5rem;
+  align-items: end;
 }
-
-/* Faz um item do grid ocupar as duas colunas */
 .grid-col-span-2 {
   grid-column: span 2;
 }
-
-/* Estilo para campos de texto somente leitura */
 .readonly-field {
   background-color: var(--light-gray);
   padding: 0.75rem;
   border-radius: 4px;
   border: 1px solid var(--border-color);
-  min-height: 47px; /* Alinha com a altura dos inputs */
+  min-height: 47px;
+  display: flex;
+  align-items: center;
+}
+
+/* Estilo padrão para textareas (bom ter aqui) */
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
 }

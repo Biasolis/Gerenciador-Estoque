@@ -13,21 +13,16 @@ import StockExitsPage from './pages/StockExitsPage';
 import PrintExitPage from './pages/PrintExitPage';
 import UsersPage from './pages/UsersPage';
 import ReportsPage from './pages/ReportsPage';
+import ProfilePage from './pages/ProfilePage'; // <-- 1. Importa a nova página
 
 function App() {
   return (
     <Routes>
-      {/* Rota Pública */}
       <Route path="/login" element={<LoginPage />} />
-      
-      {/* --- ESTRUTURA DE ROTAS PROTEGIDAS CORRIGIDA --- */}
-      {/* Todas as rotas que exigem login ficam aninhadas aqui */}
-      <Route element={<ProtectedRoute />}>
 
-        {/* Rota de impressão (renderizada SEM o MainLayout) */}
+      <Route element={<ProtectedRoute />}>
         <Route path="/print/exit/:id" element={<PrintExitPage />} />
 
-        {/* Rotas que usam o MainLayout (com sidebar, etc.) */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/estoque" element={<StockPage />} />
@@ -38,11 +33,14 @@ function App() {
           <Route path="/pessoas" element={<PeoplePage />} />
           <Route path="/usuarios" element={<UsersPage />} />
           <Route path="/relatorios" element={<ReportsPage />} />
+          {/* ============================================ */}
+          {/* !! NOVA ROTA !!                             */}
+          <Route path="/perfil" element={<ProfilePage />} /> {/* 2. Adiciona a rota */}
+          {/* ============================================ */}
         </Route>
-        
+
       </Route>
 
-      {/* Rota Padrão: Redireciona qualquer outra URL para a página inicial */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

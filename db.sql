@@ -92,3 +92,45 @@ ALTER TABLE stock_exits ALTER COLUMN requester_person_id DROP NOT NULL;
 -- Adiciona um campo de anotações na tabela de entradas
 ALTER TABLE stock_entries ADD COLUMN notes TEXT;
 
+-- novo DB --
+
+CREATE TABLE stock_exit_items (
+    id SERIAL PRIMARY KEY,
+    exit_id INTEGER NOT NULL REFERENCES stock_exits(id) ON DELETE CASCADE,
+    product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    serial_number VARCHAR(255),
+    asset_number VARCHAR(255),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_stock_exit_items_exit_id ON stock_exit_items(exit_id);
+CREATE INDEX idx_stock_exit_items_product_id ON stock_exit_items(product_id);
+
+INSERT INTO stock_exit_items (exit_id, product_id, quantity, created_at)
+SELECT
+    id,          -- O ID da saída antiga se torna a referência 'exit_id'
+    product_id,  -- O ID do produto da coluna antiga
+    quantity,    -- A quantidade da coluna antiga
+    created_at   -- Mantém a data de criação original da saída
+FROM
+    stock_exits
+WHERE
+    product_id IS NOT NULL AND quantity IS NOT NULL; -- Garante que só migre registros que tinham dados
+
+-- teste migração --
+
+SELECT COUNT(*) FROM stock_exit_items;
+
+SELECT sei.*, p.name
+FROM stock_exit_items sei
+JOIN products p ON sei.product_id = p.id
+WHERE sei.exit_id = 1; -- Substitua 1 pelo ID de uma saída antiga
+
+
+
+
+-- remove colunas antigas --
+
+ALTER TABLE stock_exits DROP COLUMN product_id;
+ALTER TABLE stock_exits DROP COLUMN quantity;

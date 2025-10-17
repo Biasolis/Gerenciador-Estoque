@@ -1,20 +1,22 @@
 const stockEntryModel = require('../models/stockEntryModel');
 const stockExitModel = require('../models/stockExitModel');
 const stockModel = require('../models/stockModel');
+const db = require('../models/db'); // Importa db para transação no adjustStock
 
 const stockController = {
-  // Criar um novo registro de entrada
+  // ... (createEntry, getAllEntries, deleteEntry, getInventory inalterados) ...
+    // Criar um novo registro de entrada
   async createEntry(req, res) {
     try {
       const user_id = req.user.id;
-      const { product_id, quantity, unit_value, entry_date } = req.body;
+      const { product_id, quantity, unit_value, entry_date, notes } = req.body;
       if (!product_id || !quantity || unit_value === undefined) {
         return res.status(400).json({ message: 'Produto, quantidade e valor unitário são obrigatórios.' });
       }
       if (quantity <= 0) {
         return res.status(400).json({ message: 'A quantidade deve ser maior que zero.' });
       }
-      const newEntry = await stockEntryModel.create({ product_id, quantity, unit_value, entry_date, user_id });
+      const newEntry = await stockEntryModel.create({ product_id, quantity, unit_value, entry_date, user_id, notes });
       res.status(201).json(newEntry);
     } catch (error) {
       console.error(error);
@@ -58,28 +60,63 @@ const stockController = {
       res.status(500).json({ message: 'Erro ao buscar o status do inventário.' });
     }
   },
-  
-  // Criar um novo registro de saída
+
+  // Função createExit MODIFICADA
   async createExit(req, res) {
     try {
       const user_id = req.user.id;
-      const { product_id, quantity, requester_person_id } = req.body;
+      const { items, requester_person_id, ticket_number, ticket_link, reason, delivery_date } = req.body;
 
-      if (!product_id || !quantity || !requester_person_id) {
-        return res.status(400).json({ message: 'Produto, quantidade e solicitante são obrigatórios.' });
+      // Validações básicas
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ message: 'Pelo menos um item deve ser adicionado à saída.' });
       }
-      
-      const currentStock = await stockModel.getCurrentStockForProduct(product_id);
+      if (!requester_person_id) {
+         return res.status(400).json({ message: 'O solicitante é obrigatório.' });
+      }
+      // ============================================
+      // !! VALIDAÇÃO ADICIONADA NO BACKEND !!
+      // ============================================
+      if (!ticket_number || ticket_number.trim() === '') {
+        return res.status(400).json({ message: 'O Nº do Ticket é obrigatório.' });
+      }
+      if (!ticket_link || ticket_link.trim() === '') {
+        return res.status(400).json({ message: 'O Link do Ticket é obrigatório.' });
+      }
+      // ============================================
 
-      if (currentStock < parseInt(quantity, 10)) {
-        return res.status(400).json({ message: `Estoque insuficiente. Quantidade disponível: ${currentStock}.` });
+      // Valida cada item e verifica o estoque ANTES de iniciar a transação
+      for (const item of items) {
+        if (!item.product_id || !item.quantity || item.quantity <= 0) {
+          return res.status(400).json({ message: 'Cada item deve ter produto e quantidade (maior que zero) válidos.' });
+        }
+         // Busca estoque atual DENTRO do loop para garantir o valor mais recente
+         // antes de confirmar a transação (embora a transação ajude a prevenir race conditions)
+        const currentStock = await stockModel.getCurrentStockForProduct(item.product_id);
+        if (currentStock < parseInt(item.quantity, 10)) {
+          // Busca nome do produto para mensagem de erro mais clara
+          const productInfo = await db.query('SELECT name FROM products WHERE id = $1', [item.product_id]);
+          const productName = productInfo.rows[0]?.name || `ID ${item.product_id}`;
+          return res.status(400).json({
+             message: `Estoque insuficiente para ${productName}. Quantidade disponível: ${currentStock}.`
+          });
+        }
       }
-      
-      const newExit = await stockExitModel.create({ ...req.body, user_id });
+
+      const exitData = {
+          ticket_number, ticket_link, reason, delivery_date, requester_person_id, user_id
+      };
+
+      const newExit = await stockExitModel.create(exitData, items);
       res.status(201).json(newExit);
+
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Erro ao registrar saída do estoque.' });
+      console.error("Erro detalhado ao criar saída:", error.stack || error);
+      // Verifica se é erro de violação de constraint (ex: estoque negativo se tivéssemos check constraint)
+      if (error.code === '23514') { // Código PostgreSQL para check violation
+           return res.status(400).json({ message: 'Erro de validação: Verifique as quantidades e o estoque disponível.' });
+      }
+      res.status(500).json({ message: 'Erro interno ao registrar saída do estoque.' });
     }
   },
 
@@ -87,13 +124,19 @@ const stockController = {
   async getAllExits(req, res) {
     try {
       const exits = await stockExitModel.findAll();
-      res.status(200).json(exits);
+      // Garante que os contadores sejam números
+      const formattedExits = exits.map(exit => ({
+        ...exit,
+        distinct_items_count: parseInt(exit.distinct_items_count || 0, 10),
+        total_quantity: parseInt(exit.total_quantity || 0, 10),
+      }));
+      res.status(200).json(formattedExits);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Erro ao buscar registros de saída.' });
     }
   },
-  
+
   // Buscar um registro de saída por ID
   async getExitById(req, res) {
     try {
@@ -115,7 +158,7 @@ const stockController = {
       const { product_id, new_quantity, reason } = req.body;
       const user_id = req.user.id;
 
-      if (!product_id || new_quantity === undefined || !reason) {
+      if (product_id === undefined || new_quantity === undefined || !reason) {
         return res.status(400).json({ message: 'Produto, nova quantidade e motivo são obrigatórios.' });
       }
 
@@ -133,30 +176,37 @@ const stockController = {
 
       const adjustmentNote = `Ajuste de inventário. Motivo: ${reason}`;
 
-      if (difference > 0) {
-        // Aumentou o estoque -> Cria uma ENTRADA
-        await stockEntryModel.create({
-          product_id,
-          quantity: difference,
-          unit_value: 0, // Valor 0 para não impactar relatórios financeiros
-          user_id,
-          notes: adjustmentNote,
-        });
-      } else {
-        // Diminuiu o estoque -> Cria uma SAÍDA
-        await stockExitModel.create({
-          product_id,
-          quantity: Math.abs(difference), // Usa o valor absoluto da diferença
-          requester_person_id: null, // Saída de ajuste não tem solicitante
-          reason: adjustmentNote,
-          user_id,
-        });
+      const client = await db.pool.connect();
+      try {
+        await client.query('BEGIN');
+
+        if (difference > 0) {
+          const entryQuery = `INSERT INTO stock_entries (product_id, quantity, unit_value, user_id, notes) VALUES ($1, $2, $3, $4, $5)`;
+          await client.query(entryQuery, [product_id, difference, 0, user_id, adjustmentNote]);
+        } else {
+           // Cria uma Ordem de Saída específica para ajuste
+          const exitQuery = `INSERT INTO stock_exits (reason, user_id, delivery_date, ticket_number, ticket_link) VALUES ($1, $2, NOW(), 'AJUSTE', 'N/A') RETURNING id`;
+          const exitRes = await client.query(exitQuery, [adjustmentNote, user_id]);
+          const exitId = exitRes.rows[0].id;
+
+          const itemQuery = `INSERT INTO stock_exit_items (exit_id, product_id, quantity) VALUES ($1, $2, $3)`;
+          // Garante que a quantidade é positiva
+          await client.query(itemQuery, [exitId, product_id, Math.abs(difference)]);
+        }
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Estoque ajustado com sucesso.' });
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
       }
 
-      res.status(200).json({ message: 'Estoque ajustado com sucesso.' });
-
     } catch (error) {
-      console.error('Erro ao ajustar estoque:', error);
+      console.error('Erro ao ajustar estoque:', error.stack || error);
+       if (error.code === '23514') { // Check violation (ex: estoque ficaria negativo)
+           return res.status(400).json({ message: 'Ajuste inválido. Verifique o estoque disponível.' });
+      }
       res.status(500).json({ message: 'Erro interno ao ajustar o estoque.' });
     }
   }

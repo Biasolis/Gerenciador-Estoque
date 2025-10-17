@@ -1,0 +1,78 @@
+.profile-page-container {
+  max-width: 700px; /* Limita a largura da página */
+  margin: 0 auto; /* Centraliza */
+}
+
+.profile-page-container h1 {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.profile-section {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+.profile-section h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.4rem;
+  color: var(--dark-gray);
+}
+
+/* Reutiliza estilos de formulário de index.css, mas podemos adicionar especificidades */
+.profile-section .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.profile-section .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.profile-section .form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.profile-section .form-group input:focus {
+   outline: none;
+   border-color: var(--primary-color);
+   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Botão dentro das seções */
+.profile-section .btn {
+  width: auto; /* Botão não ocupa largura total */
+  padding: 0.75rem 1.5rem;
+  min-width: 150px; /* Largura mínima */
+}
+
+/* Mensagens de erro e sucesso */
+.error-message {
+  color: var(--danger-color);
+  background-color: #f8d7da; /* Fundo vermelho claro */
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.success-message {
+  color: #155724; /* Verde escuro */
+  background-color: #d4edda; /* Fundo verde claro */
+  border: 1px solid #c3e6cb;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  text-align: center;
+}

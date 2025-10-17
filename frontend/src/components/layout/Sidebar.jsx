@@ -2,12 +2,11 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import './Sidebar.css';
-import logo from '../../assets/images/logo.png'; // <-- 1. Importa o logo
+import logo from '../../assets/images/logo.png';
 
 function Sidebar() {
   const { user, logout } = useAuth();
 
-  // Mantém a lógica de links dinâmicos
   const commonLinks = [
     { path: '/', label: 'Dashboard' },
     { path: '/estoque', label: 'Estoque' },
@@ -23,33 +22,58 @@ function Sidebar() {
     { path: '/usuarios', label: 'Usuários' },
   ];
 
+  // Adiciona o link de perfil dinamicamente se o usuário estiver logado
+  const profileLink = user ? [{ path: '/perfil', label: 'Meu Perfil' }] : [];
+
   return (
     <aside className="sidebar-container">
       <div className="sidebar-header">
-        {/* 2. Adiciona a imagem do logo */}
         <img src={logo} alt="Consórcio Magalu Logo" className="sidebar-logo" />
       </div>
       <nav className="sidebar-nav">
         <ul>
+          {/* Links Comuns */}
           {commonLinks.map(link => (
             <li key={link.path}>
-              <NavLink to={link.path} end>
+              <NavLink
+                to={link.path}
+                // Aplica classe 'active' apenas se for a rota exata (exceto Dashboard '/')
+                className={({ isActive }) => isActive ? 'active' : ''}
+                end={link.path !== '/'} // 'end' para correspondência exata, exceto '/'
+              >
                 {link.label}
               </NavLink>
             </li>
           ))}
+          {/* Links Admin */}
           {user?.role === 'admin' && adminLinks.map(link => (
             <li key={link.path}>
-              <NavLink to={link.path}>
+              <NavLink
+                 to={link.path}
+                 className={({ isActive }) => isActive ? 'active' : ''}
+              >
                 {link.label}
               </NavLink>
             </li>
           ))}
+          {/* ============================================ */}
+          {/* !! NOVO LINK DE PERFIL !!                   */}
+           {profileLink.map(link => (
+            <li key={link.path} style={{ marginTop: '1rem', borderTop: '1px solid #4a5568', paddingTop: '1rem' }}> {/* Estilo para separar */}
+              <NavLink
+                 to={link.path}
+                 className={({ isActive }) => isActive ? 'active' : ''}
+              >
+                {link.label}
+              </NavLink>
+            </li>
+          ))}
+          {/* ============================================ */}
         </ul>
       </nav>
       <div className="sidebar-footer">
         <div className="user-info">
-          {/* Mantém as informações do usuário dinâmicas */}
+          {/* Prioriza nickname, depois name */}
           <span className="user-name">{user?.nickname || user?.name}</span>
           <span className="user-role">{user?.role}</span>
         </div>

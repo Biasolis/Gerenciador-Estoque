@@ -1,0 +1,157 @@
+/* Estilos gerais herdados de Table.css e index.css */
+
+/* Grid dentro do Modal */
+.form-grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 1.5rem;
+  align-items: end;
+}
+.grid-col-span-2 {
+  grid-column: span 2;
+}
+
+/* ============================================ */
+/* !! AJUSTE AQUI: Aplica estilo a input E select !! */
+/* ============================================ */
+.form-grid-container .form-group input,
+.form-grid-container .form-group select, /* Adicionado select aqui */
+.form-grid-container .form-group textarea { /* Adicionado textarea aqui */
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit; /* Garante mesma fonte */
+  box-sizing: border-box;
+  min-height: 47px; /* Garante altura mínima igual ao readonly */
+}
+
+.form-grid-container .form-group input:focus,
+.form-grid-container .form-group select:focus, /* Adicionado select aqui */
+.form-grid-container .form-group textarea:focus { /* Adicionado textarea aqui */
+   outline: none;
+   border-color: var(--primary-color);
+   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+/* ============================================ */
+
+
+.readonly-field {
+  background-color: var(--light-gray);
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  min-height: 47px;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: var(--gray);
+}
+
+
+/* Seção Adicionar Item */
+.add-item-section {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem 1rem;
+  align-items: end;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1.5rem;
+}
+
+.add-item-section .form-group {
+  margin-bottom: 0;
+}
+
+.add-item-section .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ============================================ */
+/* !! AJUSTE AQUI: Aplica estilo a input E select !! */
+/* ============================================ */
+.add-item-section .form-group input,
+.add-item-section .form-group select { /* Adicionado select aqui */
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit; /* Garante mesma fonte */
+  box-sizing: border-box;
+  min-height: 47px; /* Garante altura mínima */
+}
+.add-item-section .form-group input:focus,
+.add-item-section .form-group select:focus { /* Adicionado select aqui */
+   outline: none;
+   border-color: var(--primary-color);
+   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+/* ============================================ */
+
+
+/* Define o span de cada campo no grid de 6 colunas */
+.item-product { grid-column: 1 / 7; }
+.item-quantity { grid-column: 1 / 3; }
+.item-serial { grid-column: 3 / 5; }
+.item-asset { grid-column: 5 / 7; }
+
+/* Botão de adicionar item */
+.item-add-button {
+  grid-column: 5 / 7;
+  justify-self: end;
+}
+
+.item-add-button .btn {
+   width: auto;
+   padding: 0.75rem 1.5rem;
+   white-space: nowrap;
+   font-size: 0.9rem;
+}
+
+
+/* Seção de Itens Adicionados */
+.items-added-section {
+  margin-bottom: 1.5rem;
+}
+.items-added-section h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--dark-gray);
+}
+.items-added-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.items-added-table th,
+.items-added-table td {
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+.items-added-table th {
+  background-color: var(--light-gray);
+  font-weight: 600;
+}
+.items-added-table td:last-child {
+    text-align: center;
+}
+.delete-item-btn {
+  background-color: transparent;
+  border: none;
+  color: var(--danger-color);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.2rem;
+}
+.delete-item-btn:hover {
+  text-decoration: underline;
+}
+
+/* Textarea (movido para Modal.css) */

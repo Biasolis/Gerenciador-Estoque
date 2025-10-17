@@ -2,7 +2,7 @@ const reportModel = require('../models/reportModel');
 
 const reportController = {
   async getStockExitReport(req, res) {
-    try {
+     try {
       const filters = req.query;
       const reportData = await reportModel.generateStockExitReport(filters);
       res.status(200).json(reportData);
@@ -21,9 +21,9 @@ const reportController = {
       res.status(500).json({ message: 'Erro interno ao buscar dados do resumo.' });
     }
   },
-  
+
   async getTopMovingItems(req, res) {
-    try {
+     try {
       const { startDate, endDate } = req.query;
       const topItems = await reportModel.getTopMovingItems({ startDate, endDate });
       res.status(200).json(topItems);
@@ -32,7 +32,31 @@ const reportController = {
       console.error('Erro ao buscar itens com maior saída:', error);
       res.status(500).json({ message: 'Erro interno ao buscar itens com maior saída.' });
     }
+  },
+
+  async getTopSectors(req, res) {
+    try {
+      const topSectorsData = await reportModel.getTopSectors(30);
+      res.status(200).json(topSectorsData);
+    } catch (error) {
+      console.error('Erro ao buscar top setores solicitantes:', error);
+      res.status(500).json({ message: 'Erro interno ao buscar dados do dashboard.' });
+    }
+  },
+
+  // ==============================================================
+  // !! NOVA FUNÇÃO ADICIONADA !!
+  // ==============================================================
+  async getTopRequesters(req, res) {
+    try {
+      const topRequestersData = await reportModel.getTopRequesters(30); // Usa 30 dias por padrão
+      res.status(200).json(topRequestersData);
+    } catch (error) {
+      console.error('Erro ao buscar top solicitantes:', error);
+      res.status(500).json({ message: 'Erro interno ao buscar dados do dashboard (top solicitantes).' });
+    }
   }
+  // ==============================================================
 };
 
 module.exports = reportController;

@@ -9,8 +9,8 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+import api from '../../services/api';
 
-// Precisamos registrar os componentes do Chart.js que vamos usar
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -20,53 +20,11 @@ ChartJS.register(
     Legend
 );
 
-/**
- * =========================================================================
- * !! IMPORTANTE !!
- * * Substitua esta função 'apiGet' pela sua chamada de API real.
- * Pode ser que você já tenha um serviço de API centralizado (ex: usando axios).
- * O ponto crucial é enviar o Token JWT na requisição.
- * =========================================================================
- */
-const apiGet = async (url) => {
-    // 1. Pega o token do localStorage (ou de onde você o armazena)
-    const token = localStorage.getItem('token'); 
-    if (!token) {
-        throw new Error('Token de autenticação não encontrado');
-    }
-
-    // 2. Monta a URL completa
-    // Lembre-se que no Vite, /api/ é tratado pelo proxy no modo de desenvolvimento,
-    // mas em produção, o Nginx já cuida disso. Então /api/... está correto.
-    const fullUrl = `${url}`; // Ex: /api/dashboard/top-setores
-
-    // 3. Faz a chamada fetch (ou axios)
-    const response = await fetch(fullUrl, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Falha ao buscar dados da API');
-    }
-
-    return response.json();
-};
-// =========================================================================
-
-
 const TopSetoresChart = () => {
-    // Estado para guardar os dados formatados para o gráfico
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: [],
     });
-
-    // Estado de carregamento e erro
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -74,100 +32,99 @@ const TopSetoresChart = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                
-                // Chamada para o novo endpoint que criamos no backend
-                const data = await apiGet('/api/dashboard/top-setores');
+                setError(null); // Limpa erro anterior
+                const response = await api.get('/reports/dashboard/top-setores');
+                const data = response.data;
 
-                if (data && data.length > 0) {
-                    // Processa os dados recebidos da API
-                    const labels = data.map(item => item.area_solicitante);
-                    const solicitacoesData = data.map(item => item.quantidade_solicitacoes);
-                    const produtosData = data.map(item => item.total_produtos_solicitados);
+                // ============================================
+                // !! CORREÇÃO APLICADA AQUI (LINHA ~75) !!
+                // Verifica se 'data' é realmente um array antes de usar .map
+                // ============================================
+                if (Array.isArray(data)) {
+                    if (data.length > 0) {
+                        const labels = data.map(item => item.area_solicitante);
+                        const solicitacoesData = data.map(item => item.quantidade_solicitacoes);
+                        const produtosData = data.map(item => item.total_produtos_solicitados);
 
-                    // Formata para o padrão do Chart.js
-                    setChartData({
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Nº de Solicitações',
-                                data: solicitacoesData,
-                                backgroundColor: 'rgba(54, 162, 235, 0.6)', // Azul
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1,
-                            },
-                            {
-                                label: 'Total de Itens',
-                                data: produtosData,
-                                backgroundColor: 'rgba(255, 99, 132, 0.6)', // Vermelho
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1,
-                            },
-                        ],
-                    });
+                        setChartData({
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: 'Nº de Solicitações',
+                                    data: solicitacoesData,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1,
+                                    yAxisID: 'ySolicitacoes',
+                                },
+                                {
+                                    label: 'Total de Itens',
+                                    data: produtosData,
+                                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderWidth: 1,
+                                    yAxisID: 'yProdutos',
+                                },
+                            ],
+                        });
+                    } else {
+                        // Se for um array vazio, mostra a mensagem apropriada
+                        setChartData({ labels: ['Nenhum dado encontrado nos últimos 30 dias'], datasets: [] });
+                    }
                 } else {
-                    // Caso não venha dados (ex: 30 dias sem movimento)
-                     setChartData({ labels: ['Nenhum dado encontrado nos últimos 30 dias'], datasets: [] });
+                    // Se não for um array, lança um erro indicando formato inesperado
+                    console.error("Formato de dados inesperado recebido da API para top setores:", data);
+                    throw new Error('Formato de dados inesperado recebido da API.');
                 }
 
-                setError(null);
             } catch (err) {
                 console.error("Erro ao buscar dados para o gráfico:", err);
-                setError(err.message || 'Não foi possível carregar o gráfico.');
-                setChartData({ labels: [], datasets: [] }); // Limpa em caso de erro
+                const errorMsg = err.response?.data?.message || err.message || 'Não foi possível carregar o gráfico.';
+                setError(errorMsg);
+                setChartData({ labels: [], datasets: [] });
             } finally {
                 setLoading(false);
             }
         };
 
         fetchData();
-    }, []); // O array vazio garante que isso rode apenas uma vez (ao montar)
+    }, []);
 
-    // Configurações visuais do gráfico
     const options = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-            legend: {
-                position: 'top',
-            },
+            legend: { position: 'top' },
             title: {
                 display: true,
                 text: 'Top 5 Áreas Solicitantes (Últimos 30 dias)',
-                font: {
-                    size: 18
-                }
+                font: { size: 16 }
             },
+            tooltip: { mode: 'index', intersect: false },
         },
         scales: {
-            y: {
-                beginAtZero: true,
-                title: {
-                    display: true,
-                    text: 'Quantidade'
-                }
+            x: { title: { display: true, text: 'Áreas' } },
+            ySolicitacoes: {
+                type: 'linear', display: true, position: 'left',
+                beginAtZero: true, title: { display: true, text: 'Nº de Solicitações' },
+                grid: { drawOnChartArea: false }, ticks: { precision: 0 }
             },
-            x: {
-                 title: {
-                    display: true,
-                    text: 'Áreas'
-                }
-            }
-        }
+            yProdutos: {
+                type: 'linear', display: true, position: 'right',
+                beginAtZero: true, title: { display: true, text: 'Total de Itens Solicitados' },
+                ticks: { precision: 0 }
+            },
+        },
+        interaction: { mode: 'index', intersect: false },
     };
 
-    // Estilos para os contêineres de loading e erro
     const containerStyle = {
-        padding: '20px', 
-        border: '1px solid #e0e0e0', 
-        borderRadius: '8px', 
-        backgroundColor: '#ffffff',
-        minHeight: '200px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#666'
+        padding: '20px', border: '1px solid #e0e0e0', borderRadius: '8px',
+        backgroundColor: '#ffffff', minHeight: '300px', display: 'flex',
+        alignItems: 'center', justifyContent: 'center', color: '#666'
     };
+    const chartContainerStyle = { position: 'relative', height: '350px', width: '100%' };
 
-    // Renderização condicional
     if (loading) {
         return <div style={containerStyle}>Carregando dados do gráfico...</div>;
     }
@@ -176,8 +133,12 @@ const TopSetoresChart = () => {
         return <div style={{...containerStyle, color: 'red'}}>{error}</div>;
     }
 
+    if (chartData.labels.length === 0 || chartData.labels[0]?.includes('Nenhum dado')) {
+         return <div style={containerStyle}>Nenhum dado de saída encontrado nos últimos 30 dias para gerar o gráfico.</div>;
+    }
+
     return (
-        <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#fff' }}>
+         <div style={chartContainerStyle}>
             <Bar options={options} data={chartData} />
         </div>
     );

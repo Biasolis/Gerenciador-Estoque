@@ -1,0 +1,59 @@
+/* Reutiliza a classe 'dashboard-card' para o container principal,
+   mas podemos adicionar estilos específicos se necessário */
+.top-requesters-card .card-content {
+  padding-top: 0.5rem; /* Menos padding superior no conteúdo da lista */
+}
+
+.requesters-list {
+  list-style: none; /* Remove os números padrão da lista ordenada */
+  padding: 0;
+  margin: 0;
+  counter-reset: requester-counter; /* Inicia um contador CSS */
+}
+
+.requesters-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+  counter-increment: requester-counter; /* Incrementa o contador para cada item */
+}
+
+.requesters-list li:last-child {
+  border-bottom: none;
+}
+
+/* Adiciona o número do ranking usando o contador CSS */
+.requesters-list li::before {
+  content: counter(requester-counter);
+  font-weight: bold;
+  color: var(--gray);
+  margin-right: 1rem;
+  min-width: 20px; /* Garante alinhamento */
+  text-align: right;
+}
+
+.requester-name {
+  flex-grow: 1; /* O nome ocupa o espaço restante */
+  margin-right: 1rem;
+  overflow: hidden; /* Evita que nomes longos quebrem o layout */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.requester-count {
+  font-weight: bold;
+  background-color: var(--light-gray);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 30px; /* Garante alinhamento */
+  text-align: center;
+}
+
+.error-message { /* Define estilo para mensagem de erro se não existir */
+    color: var(--danger-color);
+    font-size: 0.9rem;
+    text-align: center;
+}

@@ -5,6 +5,10 @@ const stockModel = {
    * Calcula o status atual do inventário para todos os produtos.
    */
   async getInventoryStatus() {
+    // ============================================
+    // !! CORREÇÃO APLICADA AQUI !!
+    // A subquery para saídas agora usa SUM(sei.quantity) da tabela stock_exit_items
+    // ============================================
     const query = `
       SELECT
         p.id,
@@ -12,16 +16,22 @@ const stockModel = {
         p.model,
         p.description,
         (
-          (SELECT COALESCE(SUM(se.quantity), 0) FROM stock_entries se WHERE se.product_id = p.id) -
-          (SELECT COALESCE(SUM(sx.quantity), 0) FROM stock_exits sx WHERE sx.product_id = p.id)
+          COALESCE((SELECT SUM(se.quantity) FROM stock_entries se WHERE se.product_id = p.id), 0) -
+          COALESCE((SELECT SUM(sei.quantity) FROM stock_exit_items sei WHERE sei.product_id = p.id), 0) -- Corrigido aqui
         ) AS current_stock
       FROM
         products p
       ORDER BY
         p.name ASC;
     `;
-    const { rows } = await db.query(query);
-    return rows;
+    try {
+        const { rows } = await db.query(query);
+        return rows;
+    } catch(error) {
+        console.error("Erro ao buscar status do inventário (getInventoryStatus):", error);
+        if(error.stack) console.error(error.stack);
+        throw error;
+    }
   },
 
   /**
@@ -30,15 +40,26 @@ const stockModel = {
    * @returns {Promise<number>} - A quantidade atual em estoque.
    */
   async getCurrentStockForProduct(productId) {
+     // ============================================
+    // !! CORREÇÃO APLICADA AQUI TAMBÉM !!
+    // A subquery para saídas agora usa SUM(sei.quantity) da tabela stock_exit_items
+    // ============================================
     const query = `
       SELECT
         (
-          (SELECT COALESCE(SUM(se.quantity), 0) FROM stock_entries se WHERE se.product_id = $1) -
-          (SELECT COALESCE(SUM(sx.quantity), 0) FROM stock_exits sx WHERE sx.product_id = $1)
+          COALESCE((SELECT SUM(se.quantity) FROM stock_entries se WHERE se.product_id = $1), 0) -
+          COALESCE((SELECT SUM(sei.quantity) FROM stock_exit_items sei WHERE sei.product_id = $1), 0) -- Corrigido aqui
         ) AS current_stock;
     `;
-    const { rows } = await db.query(query, [productId]);
-    return parseInt(rows[0].current_stock, 10);
+    try {
+        const { rows } = await db.query(query, [productId]);
+        // Garante que retornamos 0 se não houver resultado (produto nunca movimentado)
+        return parseInt(rows[0]?.current_stock || 0, 10);
+    } catch(error) {
+         console.error(`Erro ao buscar estoque atual para produto ${productId}:`, error);
+         if(error.stack) console.error(error.stack);
+         throw error;
+    }
   }
 };
 
