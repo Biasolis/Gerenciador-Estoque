@@ -45,7 +45,7 @@ const reportController = {
   },
 
   // ==============================================================
-  // !! NOVA FUNÇÃO ADICIONADA !!
+  // !! FUNÇÃO EXISTENTE (DO SEU ARQUIVO) !!
   // ==============================================================
   async getTopRequesters(req, res) {
     try {
@@ -55,8 +55,21 @@ const reportController = {
       console.error('Erro ao buscar top solicitantes:', error);
       res.status(500).json({ message: 'Erro interno ao buscar dados do dashboard (top solicitantes).' });
     }
-  }
+  },
   // ==============================================================
+
+  // ==============================================================
+  // !! NOVA FUNÇÃO ADICIONADA !!
+  // ==============================================================
+  async getLastRequests(req, res) {
+    try {
+      const lastRequests = await reportModel.getLastRequests();
+      res.status(200).json(lastRequests);
+    } catch (error) {
+      console.error('Erro ao buscar últimas solicitações:', error);
+      res.status(500).json({ message: 'Erro interno ao buscar últimas solicitações.' });
+    }
+  }
 };
 
 module.exports = reportController;

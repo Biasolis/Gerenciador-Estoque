@@ -201,6 +201,34 @@ const reportModel = {
       }
       throw error;
     }
+  },
+
+  // ============================================
+  // !! NOVA FUNÇÃO ADICIONADA !!
+  // ============================================
+  async getLastRequests() {
+    const query = `
+      SELECT
+        sx.id,
+        sx.ticket_number,
+        person.name AS requester_name,
+        sx.created_at,
+        (SELECT SUM(sei.quantity) FROM stock_exit_items sei WHERE sei.exit_id = sx.id) AS total_quantity
+      FROM stock_exits sx
+      JOIN people person ON sx.requester_person_id = person.id
+      ORDER BY sx.created_at DESC
+      LIMIT 5;
+    `;
+    try {
+      const { rows } = await db.query(query);
+      return rows;
+    } catch (error) {
+      console.error('Erro ao buscar últimas solicitações (getLastRequests):', error);
+      if (error.stack) {
+        console.error(error.stack);
+      }
+      throw error;
+    }
   }
 };
 

@@ -72,3 +72,34 @@
   font-weight: 700;
   text-align: right;
 }
+
+/* ============================================ */
+/* !! NOVOS ESTILOS ADICIONADOS !!              */
+/* ============================================ */
+.last-requests-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.last-requests-table td {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.last-requests-table tr:last-child td {
+  border-bottom: none;
+}
+
+.requester-name {
+  font-weight: 600;
+}
+
+.request-details { /* Renomeado para clareza */
+  font-size: 0.9em;
+  color: var(--gray);
+}
+
+.d-block {
+  display: block;
+}
+/* ============================================ */

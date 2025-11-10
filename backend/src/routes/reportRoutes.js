@@ -8,10 +8,13 @@ router.get('/dashboard-summary', authorize(['admin', 'user']), reportController.
 router.get('/top-moving-items', authorize(['admin', 'user']), reportController.getTopMovingItems);
 router.get('/dashboard/top-setores', authorize(['admin', 'user']), reportController.getTopSectors);
 
+// Rota existente (do seu arquivo)
+router.get('/dashboard/top-requesters', authorize(['admin', 'user']), reportController.getTopRequesters);
+
 // ==============================================================
 // !! NOVA ROTA ADICIONADA !!
-router.get('/dashboard/top-requesters', authorize(['admin', 'user']), reportController.getTopRequesters);
 // ==============================================================
+router.get('/dashboard/last-requests', authorize(['admin', 'user']), reportController.getLastRequests);
 
 // Rota de Relatório de Saídas (apenas admin)
 router.get('/stock-exits', authorize(['admin']), reportController.getStockExitReport);
